@@ -1,4 +1,3 @@
-#
 # VPC Resources
 #  * VPC
 #  * Subnets
@@ -9,10 +8,10 @@
 resource "aws_vpc" "demo" {
   cidr_block = "10.20.0.0/16"
 
-  tags = map(
-    "Name", "dotpay-dev-demonode",
-    "kubernetes.io/cluster/${var.cluster-name}", "shared",
-  )
+  tags = tomap({
+    "Name" = "dotpay-dev-demonode"
+    "kubernetes.io/cluster/${var.cluster-name}" = "shared",
+  })
 }
 
 resource "aws_subnet" "demo" {
@@ -23,10 +22,10 @@ resource "aws_subnet" "demo" {
   map_public_ip_on_launch = true
   vpc_id                  = aws_vpc.demo.id
 
-  tags = map(
-    "Name", "dotpay-dev-demonode",
-    "kubernetes.io/cluster/${var.cluster-name}", "shared",
-  )
+  tags = tomap({
+    "Name" = "dotpay-dev-demonode"
+    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
+  })
 }
 
 resource "aws_internet_gateway" "demo" {
@@ -44,7 +43,7 @@ resource "aws_route_table" "demo" {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.demo.id
   }
-  
+
 }
 
 resource "aws_route_table_association" "demo" {
@@ -59,7 +58,7 @@ resource "aws_eip" "nat_eip" {
 }
 resource "aws_nat_gateway" "nat" {
   allocation_id = "${aws_eip.nat_eip.id}"
-  subnet_id     = "${element(aws_subnet.demo.*.id[count.index])}"
+  subnet_id     = "${element(aws_subnet.demo.*.id, 0)}"
   depends_on    = [aws_internet_gateway.demo]
   tags = {
     Name        = "nat"
