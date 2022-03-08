@@ -7,7 +7,7 @@ terraform {
       region         = "us-west-1"
 
       dynamodb_table = "dotpaydB"
-      encrypt        = true
+      #encrypt        = true
 
    }
 
@@ -52,8 +52,8 @@ terraform {
 
  resource "aws_dynamodb_table" "terraform_statelock" {
     name = "${var.aws_dynamodb_table}"
-    read_capacity = 20
-    write_capacity = 20
+    #read_capacity = 20
+    #write_capacity = 20
     hash_key = "LockID"
 
     attribute {
